@@ -1,0 +1,9 @@
+node_modules/
+js/
+
+texto-bundle.js
+
+.*.swp
+.*.swo
+.*.swq
+
