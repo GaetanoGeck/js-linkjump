@@ -234,10 +234,14 @@ class View extends model_1.ModelObserver {
     constructor() {
         super();
         this.observers = [];
+        this.statisticsAll = new Statistics();
+        this.statisticsFiltered = new Statistics();
         this.command = dom.getHtmlInputElement("Command");
+        this.status = dom.getHtmlElement("Status");
         this.linkGroups = dom.getHtmlElement("LinkGroups");
         this.command.oninput = () => this.onCommandChanged();
         this.command.onkeyup = (e) => this.onKeyUp(e);
+        this.updateStatus();
     }
     observe(observer) {
         this.observers.push(observer);
@@ -257,24 +261,68 @@ class View extends model_1.ModelObserver {
     onLinkGroupAdd(linkGroup) {
         const linkGroupRep = widget.createLinkGroup(this, linkGroup);
         this.linkGroups.appendChild(linkGroupRep);
+        this.statisticsAll.addLinkGroup(linkGroup);
+        this.statisticsFiltered.addLinkGroup(linkGroup);
+        this.updateStatus();
     }
     onFilter(linkGroups) {
+        this.statisticsFiltered.reset();
         linkGroups.forEach(g => this.filterGroup(g));
+        this.updateStatus();
     }
     filterGroup(linkGroup) {
         const linkGroupElem = dom.getHtmlElement(linkGroup.id);
+        if (linkGroup.matchesFilter) {
+            this.statisticsFiltered.numberOfGroups++;
+        }
         linkGroupElem.hidden = !linkGroup.matchesFilter;
         linkGroup.links.forEach(link => this.filterLink(link));
     }
     filterLink(link) {
         const linkElem = dom.getHtmlElement(link.id);
+        if (link.matchesFilter) {
+            this.statisticsFiltered.numberOfLinks++;
+        }
         linkElem.hidden = !link.matchesFilter;
+    }
+    updateStatus() {
+        const statusLinks = this.statusLinks();
+        const statusGroups = this.statusGroups();
+        this.status.innerText = `Showing ${statusLinks} in ${statusGroups}`;
+    }
+    statusLinks() {
+        const numAllLinks = this.statisticsAll.numberOfLinks;
+        const numFilteredLinks = this.statisticsFiltered.numberOfLinks;
+        return (numFilteredLinks == numAllLinks)
+            ? `all of ${numAllLinks} links`
+            : `${numFilteredLinks} of ${numAllLinks} links`;
+    }
+    statusGroups() {
+        const numAllGroups = this.statisticsAll.numberOfGroups;
+        const numFilteredGroups = this.statisticsFiltered.numberOfGroups;
+        return (numFilteredGroups == numAllGroups)
+            ? `all of ${numAllGroups} groups`
+            : `${numFilteredGroups} of ${numAllGroups} groups`;
     }
 }
 exports.View = View;
 class ViewObserver {
 }
 exports.ViewObserver = ViewObserver;
+class Statistics {
+    constructor() {
+        this.numberOfLinks = 0;
+        this.numberOfGroups = 0;
+    }
+    reset() {
+        this.numberOfLinks = 0;
+        this.numberOfGroups = 0;
+    }
+    addLinkGroup(linkGroup) {
+        this.numberOfGroups++;
+        this.numberOfLinks += linkGroup.links.length;
+    }
+}
 
 },{"../model/model":4,"./dom-utils":5,"./widget":7}],7:[function(require,module,exports){
 "use strict";

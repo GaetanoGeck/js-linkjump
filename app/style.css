@@ -1,3 +1,8 @@
 .Link {
 	text-align: left;
 }
+
+#Status {
+	font-size: 9pt;
+	color: #808080;
+}

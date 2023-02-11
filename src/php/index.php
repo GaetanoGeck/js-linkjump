@@ -12,6 +12,7 @@
 	<body>
 
 		<div class="container mx-auto m-2">
+			<label id="Status" for="Command"></label>
 			<input id="Command" type="text" class="form-control mb-3" placeholder="Jump to ..." autofocus/>
 			<div class="container m-2">
 				<div id="LinkGroups"></div>
