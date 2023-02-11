@@ -20,6 +20,14 @@ export class Model {
 		this.observers.forEach(obs => obs.onLinkGroupAdd(group))
 	}
 
+	visibleLinks(): Link[] {
+		return this.allLinks().filter(link => link.matchesFilter)
+	}
+
+	private allLinks(): Link[] {
+		return this.linkGroups.flatMap(lg => lg.links)
+	}
+
 	filter(f: Filter): void {
 		this.linkGroups.forEach(g => this.filterGroup(f, g))
 		this.observers.forEach(obs => obs.onFilter(this.linkGroups))

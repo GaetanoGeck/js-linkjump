@@ -10,7 +10,7 @@ _global.initLinkjump = function() {
 	app = new App()
 }
 
-_global.group = function(groupName: string, links: Link[]) {
+_global.group = function(groupName: string, links: Link[]): void {
 	const linkGroup = new LinkGroup(groupName, links)
 	app!.addGroup(linkGroup)
 }
@@ -18,7 +18,6 @@ _global.group = function(groupName: string, links: Link[]) {
 _global.link = function(label: string, href: string, command: string = ""): Link {
 	return new Link(label, href, command)
 }
-
 
 class App {
 	model: Model
@@ -32,8 +31,9 @@ class App {
 		this.controller = new Controller(this.model, this.view)
 	}
 
-	addGroup(linkGroup: LinkGroup) {
+	addGroup(linkGroup: LinkGroup): void {
 		this.model.addGroup(linkGroup)
 	}
+
 }
 

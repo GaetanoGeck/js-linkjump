@@ -13,13 +13,22 @@ export class View extends ModelObserver {
 		super()
 		this.command = dom.getHtmlInputElement("Command")
 		this.linkGroups = dom.getHtmlElement("LinkGroups")
-		dom.registerOnInput( //
-			this.command, //
-			() => this.onCommandChanged())
+		this.command.oninput = () => this.onCommandChanged()
+		this.command.onkeyup = (e: KeyboardEvent) => this.onKeyUp(e)
 	}
 
 	observe(observer: ViewObserver): void {
 		this.observers.push(observer)
+	}
+
+	openLink(link: Link): void {
+		this.observers.forEach(x => x.onOpenLink(link))
+	}
+
+	onKeyUp(event: KeyboardEvent): void {
+		if (event.key == 'Enter') {
+			this.observers.forEach(x => x.onEnter())
+		}
 	}
 
 	onCommandChanged(): void {
@@ -28,7 +37,7 @@ export class View extends ModelObserver {
 	}
 
 	onLinkGroupAdd(linkGroup: LinkGroup): void {
-		const linkGroupRep = widget.createLinkGroup(linkGroup)
+		const linkGroupRep = widget.createLinkGroup(this, linkGroup)
 		this.linkGroups.appendChild(linkGroupRep)
 	}
 	
@@ -49,5 +58,7 @@ export class View extends ModelObserver {
 }
 
 export abstract class ViewObserver {
-	abstract onCommandChanged(command: string): void;
+	abstract onOpenLink(link: Link): void
+	abstract onCommandChanged(command: string): void
+	abstract onEnter(): void
 }

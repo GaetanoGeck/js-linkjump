@@ -18,6 +18,16 @@ class Controller extends view_1.ViewObserver {
         const filter = new filter_1.Filter(command);
         this.model.filter(filter);
     }
+    onEnter() {
+        const visibleLinks = this.model.visibleLinks();
+        if (visibleLinks.length > 0) {
+            const selectedLink = visibleLinks[0];
+            this.onOpenLink(selectedLink);
+        }
+    }
+    onOpenLink(link) {
+        window.open(link.href, "_self");
+    }
 }
 exports.Controller = Controller;
 
@@ -129,6 +139,12 @@ class Model {
         this.linkGroups.push(group);
         this.observers.forEach(obs => obs.onLinkGroupAdd(group));
     }
+    visibleLinks() {
+        return this.allLinks().filter(link => link.matchesFilter);
+    }
+    allLinks() {
+        return this.linkGroups.flatMap(lg => lg.links);
+    }
     filter(f) {
         this.linkGroups.forEach(g => this.filterGroup(f, g));
         this.observers.forEach(obs => obs.onFilter(this.linkGroups));
@@ -173,7 +189,7 @@ Link.count = 1;
 "use strict";
 // Utilities for DOM operations
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.registerOnInput = exports.getHtmlInputElement = exports.getHtmlElement = void 0;
+exports.getHtmlInputElement = exports.getHtmlElement = void 0;
 function getHtmlElement(id) {
     return document.getElementById(id);
 }
@@ -182,10 +198,6 @@ function getHtmlInputElement(id) {
     return document.getElementById(id);
 }
 exports.getHtmlInputElement = getHtmlInputElement;
-function registerOnInput(elem, action) {
-    elem.oninput = action;
-}
-exports.registerOnInput = registerOnInput;
 
 },{}],6:[function(require,module,exports){
 "use strict";
@@ -224,19 +236,26 @@ class View extends model_1.ModelObserver {
         this.observers = [];
         this.command = dom.getHtmlInputElement("Command");
         this.linkGroups = dom.getHtmlElement("LinkGroups");
-        dom.registerOnInput(//
-        this.command, //
-        () => this.onCommandChanged());
+        this.command.oninput = () => this.onCommandChanged();
+        this.command.onkeyup = (e) => this.onKeyUp(e);
     }
     observe(observer) {
         this.observers.push(observer);
+    }
+    openLink(link) {
+        this.observers.forEach(x => x.onOpenLink(link));
+    }
+    onKeyUp(event) {
+        if (event.key == 'Enter') {
+            this.observers.forEach(x => x.onEnter());
+        }
     }
     onCommandChanged() {
         const command = this.command.value;
         this.observers.forEach(x => x.onCommandChanged(command));
     }
     onLinkGroupAdd(linkGroup) {
-        const linkGroupRep = widget.createLinkGroup(linkGroup);
+        const linkGroupRep = widget.createLinkGroup(this, linkGroup);
         this.linkGroups.appendChild(linkGroupRep);
     }
     onFilter(linkGroups) {
@@ -261,7 +280,7 @@ exports.ViewObserver = ViewObserver;
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createLinkGroup = void 0;
-function createLinkGroup(linkGroup) {
+function createLinkGroup(view, linkGroup) {
     const elem = document.createElement("div");
     elem.id = linkGroup.id;
     elem.classList.add("card", "m-3");
@@ -277,28 +296,28 @@ function createLinkGroup(linkGroup) {
     function createCardBody() {
         const bodyElem = document.createElement("div");
         bodyElem.classList.add("card-body");
-        bodyElem.appendChild(createGroupListElement(linkGroup));
+        bodyElem.appendChild(createGroupListElement(view, linkGroup));
         return bodyElem;
     }
 }
 exports.createLinkGroup = createLinkGroup;
-function createGroupListElement(linkGroup) {
+function createGroupListElement(view, linkGroup) {
     const elem = document.createElement("div");
     elem.role = "group";
     elem.classList.add(//
     "btn-group-vertical", //
     "btn-group-sm");
-    const links = linkGroup.links.map(x => createLinkElement(x));
+    const links = linkGroup.links.map(x => createLinkElement(view, x));
     links.forEach(x => elem.appendChild(x));
     return elem;
 }
-function createLinkElement(link) {
+function createLinkElement(view, link) {
     const elem = document.createElement("button");
     elem.id = link.id;
     elem.type = "button";
     elem.classList.add("btn", "Link");
     elem.innerText = `〉${link.label}`;
-    elem.onclick = () => window.open(link.href, "_self");
+    elem.onclick = () => view.openLink(link);
     elem.title = `Jump to ${link.href}`;
     return elem;
 }

@@ -7,8 +7,3 @@ export function getHtmlElement(id: string): HTMLElement {
 export function getHtmlInputElement(id: string): HTMLInputElement {
 	return <HTMLInputElement> document.getElementById(id)
 }
-
-export function registerOnInput(elem: HTMLInputElement, action: () => void) {
-	elem.oninput = action
-}
-
