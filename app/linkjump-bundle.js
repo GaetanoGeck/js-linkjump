@@ -13,7 +13,6 @@ class Controller extends view_1.ViewObserver {
         view.observe(this);
     }
     onCommandChanged(command) {
-        // TODO
         console.log(`Command changed: ${command}`);
         const filter = new filter_1.Filter(command);
         this.model.filter(filter);
@@ -42,6 +41,9 @@ var app;
 _global.initLinkjump = function () {
     app = new App();
 };
+_global.startApp = function () {
+    app.start();
+};
 _global.group = function (groupName, links) {
     const linkGroup = new model_1.LinkGroup(groupName, links);
     app.addGroup(linkGroup);
@@ -56,9 +58,19 @@ class App {
         this.model.observe(this.view);
         this.controller = new controller_1.Controller(this.model, this.view);
     }
+    start() {
+        const query = urlParameter("query");
+        if (query !== null) {
+            this.view.changeCommand(query);
+        }
+    }
     addGroup(linkGroup) {
         this.model.addGroup(linkGroup);
     }
+}
+function urlParameter(key) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(key);
 }
 
 },{"./controller/controller":1,"./model/model":4,"./view/view":6}],3:[function(require,module,exports){
@@ -253,6 +265,10 @@ class View extends model_1.ModelObserver {
         if (event.key == 'Enter') {
             this.observers.forEach(x => x.onEnter());
         }
+    }
+    changeCommand(command) {
+        this.command.value = command;
+        this.onCommandChanged();
     }
     onCommandChanged() {
         const command = this.command.value;

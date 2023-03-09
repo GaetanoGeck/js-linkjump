@@ -17,7 +17,6 @@ export class Controller extends ViewObserver {
 	}
 
 	onCommandChanged(command: string): void {
-		// TODO
 		console.log(`Command changed: ${command}`)
 		const filter = new Filter(command)
 		this.model.filter(filter)
@@ -36,4 +35,3 @@ export class Controller extends ViewObserver {
 	}
 
 }
-

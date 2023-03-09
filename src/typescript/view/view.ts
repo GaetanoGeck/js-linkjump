@@ -37,6 +37,11 @@ export class View extends ModelObserver {
 		}
 	}
 
+	changeCommand(command: string): void {
+		this.command.value = command
+		this.onCommandChanged()
+	}
+
 	onCommandChanged(): void {
 		const command = this.command.value
 		this.observers.forEach(x => x.onCommandChanged(command))

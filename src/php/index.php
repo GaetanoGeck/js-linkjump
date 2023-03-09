@@ -28,5 +28,6 @@
 		<script src="links.js"></script>
 		<!-- END OF USER-DEFINED LINKS -->
 
+		<script type="text/javascript">startApp()</script>
 	</body>
 </html>
