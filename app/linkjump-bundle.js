@@ -1,8 +1,20 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Config = void 0;
+class Config {
+    constructor() {
+        this.hurry = false;
+    }
+}
+exports.Config = Config;
+
+},{}],2:[function(require,module,exports){
+"use strict";
 // Controller
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Controller = void 0;
+const config_1 = require("./config");
 const filter_1 = require("../model/filter");
 const view_1 = require("../view/view");
 class Controller extends view_1.ViewObserver {
@@ -10,12 +22,23 @@ class Controller extends view_1.ViewObserver {
         super();
         this.model = model;
         this.view = view;
+        this.config = new config_1.Config();
         view.observe(this);
     }
     onCommandChanged(command) {
         console.log(`Command changed: ${command}`);
         const filter = new filter_1.Filter(command);
         this.model.filter(filter);
+        if (this.config.hurry) {
+            this.hurry();
+        }
+    }
+    hurry() {
+        const matches = this.model.matchingLinks;
+        if (matches.length == 1) {
+            var uniqueLink = matches[0];
+            this.onOpenLink(uniqueLink);
+        }
     }
     onEnter() {
         const visibleLinks = this.model.visibleLinks();
@@ -30,7 +53,7 @@ class Controller extends view_1.ViewObserver {
 }
 exports.Controller = Controller;
 
-},{"../model/filter":3,"../view/view":6}],2:[function(require,module,exports){
+},{"../model/filter":4,"../view/view":7,"./config":1}],3:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const model_1 = require("./model/model");
@@ -59,7 +82,15 @@ class App {
         this.controller = new controller_1.Controller(this.model, this.view);
     }
     start() {
-        const query = urlParameter("query");
+        this.setUpConfiguration();
+        this.considerUrlQuery();
+    }
+    setUpConfiguration() {
+        const c = this.controller.config;
+        c.hurry = hasUrlParameter("hurry");
+    }
+    considerUrlQuery() {
+        const query = urlParameterValue("query");
         if (query !== null) {
             this.view.changeCommand(query);
         }
@@ -68,12 +99,16 @@ class App {
         this.model.addGroup(linkGroup);
     }
 }
-function urlParameter(key) {
+function urlParameterValue(key, defaultValue = null) {
     const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get(key);
+    return urlParams.get(key) || defaultValue;
+}
+function hasUrlParameter(key) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.has(key) || false;
 }
 
-},{"./controller/controller":1,"./model/model":4,"./view/view":6}],3:[function(require,module,exports){
+},{"./controller/controller":2,"./model/model":5,"./view/view":7}],4:[function(require,module,exports){
 "use strict";
 // Filter
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -133,7 +168,7 @@ function filterKeys(parts) {
         .map(s => s.trim());
 }
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 "use strict";
 // Model
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -141,6 +176,7 @@ exports.Link = exports.LinkGroup = exports.ModelObserver = exports.Model = void 
 class Model {
     constructor(linkGroups) {
         this.observers = [];
+        this.matchingLinks = [];
         this.linkGroups = linkGroups;
     }
     observe(observer) {
@@ -158,6 +194,7 @@ class Model {
         return this.linkGroups.flatMap(lg => lg.links);
     }
     filter(f) {
+        this.matchingLinks = [];
         this.linkGroups.forEach(g => this.filterGroup(f, g));
         this.observers.forEach(obs => obs.onFilter(this.linkGroups));
     }
@@ -168,6 +205,9 @@ class Model {
     }
     filterLink(f, link, group) {
         link.matchesFilter = f.matches(link, group);
+        if (link.matchesFilter) {
+            this.matchingLinks.push(link);
+        }
         return link.matchesFilter;
     }
 }
@@ -197,7 +237,7 @@ class Link {
 exports.Link = Link;
 Link.count = 1;
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 "use strict";
 // Utilities for DOM operations
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -211,7 +251,7 @@ function getHtmlInputElement(id) {
 }
 exports.getHtmlInputElement = getHtmlInputElement;
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 "use strict";
 // View
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
@@ -340,7 +380,7 @@ class Statistics {
     }
 }
 
-},{"../model/model":4,"./dom-utils":5,"./widget":7}],7:[function(require,module,exports){
+},{"../model/model":5,"./dom-utils":6,"./widget":8}],8:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createLinkGroup = void 0;
@@ -386,4 +426,4 @@ function createLinkElement(view, link) {
     return elem;
 }
 
-},{}]},{},[2]);
+},{}]},{},[3]);

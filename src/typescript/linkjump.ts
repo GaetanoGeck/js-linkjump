@@ -36,7 +36,17 @@ class App {
 	}
 
 	start() {
-		const query = urlParameter("query")
+		this.setUpConfiguration()
+		this.considerUrlQuery()
+	}
+
+	private setUpConfiguration() {
+		const c = this.controller.config
+		c.hurry = hasUrlParameter("hurry")
+	}
+
+	private considerUrlQuery() {
+		const query = urlParameterValue("query")
 		if (query !== null) {
 			this.view.changeCommand(query)
 		}
@@ -48,7 +58,12 @@ class App {
 
 }
 
-function urlParameter(key: string): string | null {
-	const urlParams = new URLSearchParams(window.location.search);
-	return urlParams.get(key)
+function urlParameterValue(key: string, defaultValue: string|null=null): string | null {
+	const urlParams = new URLSearchParams(window.location.search)
+	return urlParams.get(key) || defaultValue
+}
+
+function hasUrlParameter(key: string): boolean {
+	const urlParams = new URLSearchParams(window.location.search)
+	return urlParams.has(key) || false
 }

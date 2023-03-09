@@ -5,6 +5,7 @@ import { Filter } from "./filter"
 export class Model {
 	linkGroups: LinkGroup[]
 	observers: ModelObserver[] = []
+	matchingLinks: Link[] = []
 
 	constructor(linkGroups: LinkGroup[]) {
 		this.linkGroups = linkGroups
@@ -29,6 +30,7 @@ export class Model {
 	}
 
 	filter(f: Filter): void {
+		this.matchingLinks = []
 		this.linkGroups.forEach(g => this.filterGroup(f, g))
 		this.observers.forEach(obs => obs.onFilter(this.linkGroups))
 	}
@@ -41,6 +43,9 @@ export class Model {
 
 	private filterLink(f: Filter, link: Link, group: LinkGroup): boolean {
 		link.matchesFilter = f.matches(link, group)
+		if (link.matchesFilter) {
+			this.matchingLinks.push(link)
+		}
 		return link.matchesFilter
 	}
 

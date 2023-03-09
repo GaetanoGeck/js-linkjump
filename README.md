@@ -1,15 +1,22 @@
 # Linkjump
 
-
 The development of this tool was motivated by the desire to choose the right link from a larger collection by filtering the collection with a keyboard query.
 
-Links have a (of course) a URL and a label where the former is need to jump to right location eventually and the latter is used when displaying the filtered collection. Links can be grouped and also assigned a "command".
+Links have
+1. a URL and
+2. a label and, optionally,
+3. a command.
+
+The URL defines the jump target, the label is used when displaying the filtered collection. The command is _not_ displayed but can simplify the access to a specific link.
+
+Links can be grouped.
 
 ## Usage
 
-Just open the file `app/index.html` after configuring `app/links.js` to contain the links you're interested in.
+First, configure `app/links.js` to contain the links you're interested in. Then, open the file `app/index.html`. You're ready to jump … 
 
-The query can consist of multiple parts, separated by spaces. The links are filtered such that only those remain that match *all* parts. Only link groups with matching links are displayed. Each part is matched against the label, the URL, the command and the group name of the link such that if any matches, the link matches.
+Only those links are shown that match *all* parts of the query. Link _groups_ that contain no matching link are hidden.
+Each query part is matched against the label, the URL, the command and the group name of the link such that if any matches, the link matches.
 
 There are two types of parts that are matched in a restricted fashion only:
 - group queries, starting with a dot, like `.wiki`; and
@@ -34,3 +41,24 @@ group("News", [
 ]);
 ```
 
+## URL parameters
+
+The behaviour of the application be configured via URL parameters.
+
+Currently, the following parameters are understood:
+- `query`: start with links filtered according to the query
+- `hurry`: open link, if only a single links is shown
+
+The query parameter is particularly useful in combination with user-defined "search engines" in your browser. In _Chrome_, for instance, you can add an URL like the following with a shortcut like `lj`.
+
+```
+file:///SOMEWHERE_ON_YOUR_DISK/js-linkjump/app/index.html?query=%s
+```
+
+Or even, 
+
+```
+file:///SOMEWHERE_ON_YOUR_DISK/js-linkjump/app/index.html?query=%s&hurry
+```
+
+when you want option `hurry` to be active.
