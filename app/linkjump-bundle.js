@@ -315,7 +315,7 @@ class View extends model_1.ModelObserver {
         this.observers.forEach(x => x.onCommandChanged(command));
     }
     onLinkGroupAdd(linkGroup) {
-        const linkGroupRep = widget.createLinkGroup(this, linkGroup);
+        const linkGroupRep = widget.createLinkGroup(linkGroup);
         this.linkGroups.appendChild(linkGroupRep);
         this.statisticsAll.addLinkGroup(linkGroup);
         this.statisticsFiltered.addLinkGroup(linkGroup);
@@ -384,7 +384,7 @@ class Statistics {
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createLinkGroup = void 0;
-function createLinkGroup(view, linkGroup) {
+function createLinkGroup(linkGroup) {
     const elem = document.createElement("div");
     elem.id = linkGroup.id;
     elem.classList.add("card", "m-3");
@@ -400,30 +400,27 @@ function createLinkGroup(view, linkGroup) {
     function createCardBody() {
         const bodyElem = document.createElement("div");
         bodyElem.classList.add("card-body");
-        bodyElem.appendChild(createGroupListElement(view, linkGroup));
+        bodyElem.appendChild(createGroupListElement(linkGroup));
         return bodyElem;
     }
 }
 exports.createLinkGroup = createLinkGroup;
-function createGroupListElement(view, linkGroup) {
-    const elem = document.createElement("div");
-    elem.role = "group";
-    elem.classList.add(//
-    "btn-group-vertical", //
-    "btn-group-sm");
-    const links = linkGroup.links.map(x => createLinkElement(view, x));
+function createGroupListElement(linkGroup) {
+    const elem = document.createElement("ul");
+    elem.classList.add("LinkGroup");
+    const links = linkGroup.links.map(x => createLinkElement(x));
     links.forEach(x => elem.appendChild(x));
     return elem;
 }
-function createLinkElement(view, link) {
-    const elem = document.createElement("button");
-    elem.id = link.id;
-    elem.type = "button";
-    elem.classList.add("btn", "Link");
-    elem.innerText = `〉${link.label}`;
-    elem.onclick = () => view.openLink(link);
-    elem.title = `Jump to ${link.href}`;
-    return elem;
+function createLinkElement(link) {
+    const li = document.createElement("li");
+    const a = document.createElement("a");
+    a.id = link.id;
+    a.classList.add("Link");
+    a.innerText = link.label;
+    a.href = link.href;
+    li.appendChild(a);
+    return li;
 }
 
 },{}]},{},[3]);

@@ -1,5 +1,30 @@
+.LinkGroup {
+	list-style-type: none;
+	padding-left: 0px;
+	margin-bottom: 0px;
+}
+
+.Link::before {
+	content: "〉";
+}
+.Link:focus::before {
+	font-weight: bold;
+}
+
 .Link {
+	padding: 3px;
 	text-align: left;
+	color: #444;
+	text-decoration: none;
+	outline: none;
+}
+
+.Link:focus {
+	background-color: #f8f8ff;
+	color: #0066cc;
+}
+
+.Link:link {
 }
 
 #Status {

@@ -48,7 +48,7 @@ export class View extends ModelObserver {
 	}
 
 	onLinkGroupAdd(linkGroup: LinkGroup): void {
-		const linkGroupRep = widget.createLinkGroup(this, linkGroup)
+		const linkGroupRep = widget.createLinkGroup(linkGroup)
 		this.linkGroups.appendChild(linkGroupRep)
 		this.statisticsAll.addLinkGroup(linkGroup)
 		this.statisticsFiltered.addLinkGroup(linkGroup)

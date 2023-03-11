@@ -1,7 +1,6 @@
-import { View } from "./view"
 import { LinkGroup, Link } from "../model/model"
 
-export function createLinkGroup(view: View, linkGroup: LinkGroup): HTMLElement {
+export function createLinkGroup(linkGroup: LinkGroup): HTMLElement {
 	const elem = document.createElement("div")
 	elem.id = linkGroup.id
 	elem.classList.add("card", "m-3")
@@ -19,29 +18,26 @@ export function createLinkGroup(view: View, linkGroup: LinkGroup): HTMLElement {
 	function createCardBody(): HTMLElement {
 		const bodyElem = document.createElement("div")
 		bodyElem.classList.add("card-body")
-		bodyElem.appendChild(createGroupListElement(view, linkGroup))
+		bodyElem.appendChild(createGroupListElement(linkGroup))
 		return bodyElem
 	}
 }
 
-function createGroupListElement(view: View, linkGroup: LinkGroup): HTMLElement {
-	const elem = document.createElement("div")
-	elem.role = "group"
-	elem.classList.add( //
-		"btn-group-vertical", //
-		"btn-group-sm")
-	const links = linkGroup.links.map(x => createLinkElement(view, x))
+function createGroupListElement(linkGroup: LinkGroup): HTMLElement {
+	const elem = document.createElement("ul")
+	elem.classList.add("LinkGroup")
+	const links = linkGroup.links.map(x => createLinkElement(x))
 	links.forEach(x => elem.appendChild(x))
 	return elem
 }
 
-function createLinkElement(view: View, link: Link): HTMLElement {
-	const elem = document.createElement("button")
-	elem.id = link.id
-	elem.type = "button"
-	elem.classList.add("btn", "Link")
-	elem.innerText = `〉${link.label}`
-	elem.onclick = () => view.openLink(link)
-	elem.title = `Jump to ${link.href}`
-	return elem
+function createLinkElement(link: Link): HTMLElement {
+	const li = document.createElement("li")
+	const a = document.createElement("a")
+	a.id = link.id
+	a.classList.add("Link")
+	a.innerText = link.label
+	a.href = link.href
+	li.appendChild(a)
+	return li
 }
